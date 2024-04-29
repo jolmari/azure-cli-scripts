@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - deployment.yml
+patches:
+  # The inline patch will add labels to the deployment
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: alpine-command-execution
+        labels: 
+          app.kubernetes.io/version: 1.21.0
+          app.kubernetes.io/name: alpine-command-execution
+          app.hello: world

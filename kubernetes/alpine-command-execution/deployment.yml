@@ -1,0 +1,39 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: alpine-command-execution
+  name: alpine-command-execution
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alpine-command-execution
+  template:
+    metadata:
+      labels:
+        app: alpine-command-execution
+    spec:
+      containers:
+        - image: alpine:latest
+          name: sync
+          command: ["/bin/sh"]
+          args:
+            - "-ceu" # -c: exit on error; -e: exit on unset var; -u: exit on unset var in subshell
+            - |-
+              # Install Bash
+              apk add --no-cache bash
+
+              # Run hello world command with Bash
+              bash -c "echo Hello, World!"
+
+              # A simple long-running command to keep the container alive, this prevents the container from exiting and causing a CrashLoopBackOff
+              tail -f /dev/null
+          resources:
+            limits:
+              memory: "64Mi"
+              cpu: "100m"
+            requests:
+              memory: "32Mi"
+              cpu: "50m"
