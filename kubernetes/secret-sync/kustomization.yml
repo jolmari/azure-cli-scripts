@@ -6,7 +6,7 @@ resources:
 configMapGenerator:
   - name: sync-secret-config
     behavior: merge
-    namespace: secret-sync
+    namespace: flux-system
     literals:
       - KUBE_SECRET=my-secret
-      - SYNC_PERIOD=10
+      - SYNC_PERIOD=3600

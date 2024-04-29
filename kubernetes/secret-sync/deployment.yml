@@ -1,26 +1,14 @@
 ---
 apiVersion: v1
-kind: Namespace
-metadata:
-  name: secret-sync
-
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: default
-  namespace: secret-sync
-
----
-apiVersion: v1
 kind: ConfigMap
 metadata:
   name: sync-secret-config
-  namespace: secret-sync
+  namespace: flux-system
 data:
   # Patch this ConfigMap with additional values needed for your cloud
   KUBE_SECRET: my-secret # does not yet exist -- will be created in the same Namespace
   SYNC_PERIOD: "3600" # tokens expire; refresh faster than that
+  ADO_RESOURCE_ID: "499b84ac-1321-427f-aa17-267ca6975798"
 
 ---
 apiVersion: apps/v1
@@ -29,7 +17,7 @@ metadata:
   labels:
     app: sync-secret
   name: sync-secret
-  namespace: secret-sync
+  namespace: flux-system
 spec:
   replicas: 1
   selector:
@@ -41,11 +29,12 @@ spec:
     metadata:
       labels:
         app: sync-secret
+        aadpodidbinding: flux-source-controller
     spec:
-      serviceAccount: default
-      serviceAccountName: default
+      serviceAccount: source-controller
+      serviceAccountName: source-controller
       containers:
-        - image: alpine/k8s:1.30.0
+        - image: mcr.microsoft.com/azure-cli
           name: sync-secret
           envFrom:
             - configMapRef:
@@ -54,20 +43,30 @@ spec:
           args:
             - "-ceu" # -c: exit on error; -e: exit on unset var; -u: exit on unset var in subshell
             - |-
+
+              # Install kubectl
+              apk --no-cache add curl
+              curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+              chmod +x ./kubectl
+              mv ./kubectl /usr/local/bin
+
               reconcile() {
                 echo "Updating secret: $KUBE_SECRET -- $(date)"
                 
-
-                applySecret "$KUBE_SECRET" "git" "$(date +%s)"
-
+                echo "Logging to Azure with managed identity..."
+                az login --identity
+                echo "Getting ADO token..."
+                token=$(az account get-access-token --resource "$ADO_RESOURCE_ID" --query "accessToken" --output tsv)
+                echo "Done!"
+                
+                applySecret "$KUBE_SECRET" "git" "$token"
                 echo "Finished! -- $(date)"
-                echo
               }
 
               applySecret() {
-                kubectl create secret generic my-secret \
-                  --from-literal=username=foo \
-                  --from-literal=password= \
+                kubectl create secret generic "$1" \
+                  --from-literal=username="$2" \
+                  --from-literal=password="$3" \
                   --dry-run=client \
                   --output yaml \
                   | grep -v "creationTimestamp:" \
@@ -103,8 +102,8 @@ spec:
               done
           resources:
             limits:
-              memory: "64Mi"
+              memory: "512Mi"
               cpu: "100m"
             requests:
-              memory: "32Mi"
+              memory: "256Mi"
               cpu: "50m"
