@@ -11,7 +11,7 @@ using Org.BouncyCastle.Utilities;
 using Org.BouncyCastle.X509;
 using X509Certificate=Org.BouncyCastle.X509.X509Certificate;
 
-namespace BouncyCastleHelpers;
+namespace JwtSecurityTokenSamples;
 
 public static class X509Certificate2Builder {
 

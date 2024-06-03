@@ -2,7 +2,7 @@
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.IdentityModel.Tokens;
 
-namespace BouncyCastleHelpers;
+namespace JwtSecurityTokenSamples;
 
 public static class EntityStatementJwtSecurityTokenBuilder {
 	

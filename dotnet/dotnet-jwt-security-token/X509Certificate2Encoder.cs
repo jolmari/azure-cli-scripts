@@ -1,7 +1,7 @@
 ﻿using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.X509;
 
-namespace BouncyCastleHelpers;
+namespace JwtSecurityTokenSamples;
 
 public static class X509Certificate2Encoder {
 	public static string ConvertBase64DerToPem(string base64der) {
