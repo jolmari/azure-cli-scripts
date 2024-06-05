@@ -9,7 +9,7 @@
 
     <ItemGroup>
         <PackageReference Include="BouncyCastle.Cryptography" Version="2.4.0"/>
-        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.6.0" />
+        <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.6.0"/>
     </ItemGroup>
 
 </Project>

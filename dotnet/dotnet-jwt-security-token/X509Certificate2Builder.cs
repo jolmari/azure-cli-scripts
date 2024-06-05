@@ -27,7 +27,7 @@ public static class X509Certificate2Builder {
 	/// <returns>Created certificate object</returns>
 	public static X509Certificate2 GenerateSelfSignedRSACertificate(string kid,
 		string subjectName, string issuerName, DateTimeOffset notBefore, DateTimeOffset notAfter) {
-		
+
 		// Generate a RSA 4096 bitkey pair
 		var random = new SecureRandom();
 		var keyPairGenerator = new RsaKeyPairGenerator();
@@ -50,7 +50,7 @@ public static class X509Certificate2Builder {
 
 		// Define signature algorithm
 		var signatureFactory = new Asn1SignatureFactory("SHA256WithRSA", keyPair.Private, random);
-		
+
 		// Sign the certificate
 		var certificate = x509V3CertGen.Generate(signatureFactory);
 

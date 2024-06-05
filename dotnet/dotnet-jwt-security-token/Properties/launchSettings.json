@@ -3,9 +3,6 @@
   "profiles": {
     "JwtSecurityTokenSamples": {
       "commandName": "Project",
-      "environmentVariables": {
-        
-      }
     }
   }
 }

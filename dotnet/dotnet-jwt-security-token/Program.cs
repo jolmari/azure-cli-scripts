@@ -1,35 +1,45 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Cryptography.X509Certificates;
+﻿using System.Security.Cryptography.X509Certificates;
 using JwtSecurityTokenSamples;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 
-// var securityAlgorithm = SecurityAlgorithms.RsaSha256;
-//
-// Console.WriteLine("Creating self-signed certificate...");
-// var subjectDistinguishedName = "C=FI, ST=Uusimaa, L=Helsinki, O=Sample Oy, CN=www.sample.com";
-// var issuerDistinguishedName = "C=FI, ST=Uusimaa, L=Helsinki, O=Sample Oy, CN=www.sample.com";
-// var certificate = X509Certificate2Builder.GenerateSelfSignedRSACertificate("kid",
-// 	subjectDistinguishedName, issuerDistinguishedName, DateTimeOffset.Now, DateTimeOffset.Now.AddMonths(60));
-// Console.WriteLine("Self-signed certificate created.");
-//
-// Console.WriteLine("Building compact JWT entity statement token...");
-// var compactToken = EntityStatementJwtSecurityTokenBuilder.BuildCompact(certificate, securityAlgorithm);
-// Console.WriteLine("Compact JWT entity statement token created.");
-// Console.WriteLine(compactToken);
+var signingAlgorithm = SecurityAlgorithms.RsaSha256;
+var cekEncryptionAlgorithm = SecurityAlgorithms.RsaOAEP;
+var jwtEncryptionAlgorithm = SecurityAlgorithms.Aes256CbcHmacSha512;
+var issuer = "https://test.fi";
 
-var pemFile = File.ReadAllText(args[0]);
-var token = File.ReadAllText(args[1]);
-var issuer = args[2];
+var signingCertificate = CreateSelfSignedCertificate();
+var encryptionCertificate = CreateSelfSignedCertificate();
 
-var x509Certificate = X509Certificate2Builder.ConvertPemToX509Certificate(pemFile);
-var rsaParameters = x509Certificate.GetRSAPublicKey().ExportParameters(false);
+Console.WriteLine("Building compact JWT entity statement token...");
+var compactToken = JsonTokenBuilder.BuildJwt(signingCertificate, signingAlgorithm, issuer);
+Console.WriteLine("Compact JWT entity statement token created.");
+Console.WriteLine(compactToken);
 
 Console.WriteLine("Validating JWT entity statement token...");
-var securityTokenHandler = new JwtSecurityTokenHandler();
-var result = await JwtValidator.Validate(securityTokenHandler, rsaParameters, issuer, token);
+var firstSecurityTokenHandler = new JsonWebTokenHandler();
+var result = await JwtValidator.Validate(firstSecurityTokenHandler, issuer, compactToken, signingCertificate, true);
 
 if (result.IsValid) {
 	Console.WriteLine("JWT entity statement token is valid.");
-} else {
+}
+else {
 	Console.WriteLine("JWT entity statement token is invalid.");
+}
+
+var encryptedToken = JsonTokenBuilder.BuildJweWrappedJwt(signingCertificate, encryptionCertificate, 
+	signingAlgorithm, cekEncryptionAlgorithm, jwtEncryptionAlgorithm, issuer);
+
+var jweValidationResult = await JwtValidator.DecryptAndValidate(firstSecurityTokenHandler, issuer, encryptedToken, 
+	signingCertificate, encryptionCertificate, true);
+
+X509Certificate2 CreateSelfSignedCertificate() {
+
+	Console.WriteLine("Creating self-signed certificate...");
+	var subjectDistinguishedName = "C=FI, ST=Uusimaa, L=Helsinki, O=Sample Oy, CN=www.sample.com";
+	var issuerDistinguishedName = "C=FI, ST=Uusimaa, L=Helsinki, O=Sample Oy, CN=www.sample.com";
+	var x509Certificate2 = X509Certificate2Builder.GenerateSelfSignedRSACertificate("kid",
+		subjectDistinguishedName, issuerDistinguishedName, DateTimeOffset.Now, DateTimeOffset.Now.AddMonths(60));
+	Console.WriteLine("Self-signed certificate created.");
+	return x509Certificate2;
 }
