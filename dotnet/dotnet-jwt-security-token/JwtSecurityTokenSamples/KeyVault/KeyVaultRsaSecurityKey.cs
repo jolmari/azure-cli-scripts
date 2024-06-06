@@ -5,7 +5,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace JwtSecurityTokenSamples.KeyVault;
 
-public sealed class KeyVaultRsaSecurityKey : AsymmetricSecurityKey {
+public class KeyVaultRsaSecurityKey : AsymmetricSecurityKey {
+	public KeyVaultRsaSecurityKey() {
+	}
 
 	public KeyVaultRsaSecurityKey(KeyVaultKey key, string keyExternalName) {
 		Key = key;
@@ -13,12 +15,12 @@ public sealed class KeyVaultRsaSecurityKey : AsymmetricSecurityKey {
 	}
 
 	public KeyVaultKey Key { get; }
-	public override string KeyId { get; set; }
+	public override sealed string KeyId { get; set; }
 	public override int KeySize => new BitArray(Key.Key.N).Length;
 
-	public string KeyName => Key.Properties.Name;
-	public string KeyVersion => Key.Properties.Version;
-	public string Thumbprint => GetKeyId(Key);
+	public virtual string KeyName => Key.Properties.Name;
+	public virtual string KeyVersion => Key.Properties.Version;
+	public virtual string Thumbprint => GetKeyId(Key);
 
 	[Obsolete("HasPrivateKey method is deprecated, please use PrivateKeyStatus instead.")]
 	public override bool HasPrivateKey => true;
