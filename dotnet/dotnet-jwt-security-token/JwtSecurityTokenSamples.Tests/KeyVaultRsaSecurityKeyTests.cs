@@ -16,13 +16,13 @@ public class KeyVaultRsaSecurityKeyTests {
 		var jsonWebKey = new JsonWebKey(rsa);
 		var key = KeyModelFactory.KeyVaultKey(new KeyProperties("kid"), jsonWebKey);
 		var externalId = "your-external-id";
-		
+
 		// Act
 		var result = new KeyVaultRsaSecurityKey(key, externalId);
 
 		// Assert
 		var thumbprint = new RsaSecurityKey(rsa).ComputeJwkThumbprint();
-		
+
 		result.Key.Should().Be(key);
 		result.KeySize.Should().Be(new BitArray(key.Key.N).Length);
 		result.KeyId.Should().Be(externalId);

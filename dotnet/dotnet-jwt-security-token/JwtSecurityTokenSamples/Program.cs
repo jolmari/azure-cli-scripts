@@ -15,6 +15,10 @@ var keyVaultUri = configuration["KeyVaultUri"];
 var signingKeyId = configuration["SigningKeyId"];
 var encryptionKeyId = configuration["EncryptionKeyId"];
 
+var signingAlgorithm = SecurityAlgorithms.RsaSha256;
+var cekEncryptionAlgorithm = SecurityAlgorithms.RsaOAEP;
+var jwtEncryptionAlgorithm = SecurityAlgorithms.Aes256CbcHmacSha512;
+
 var signingKeyExternalKid = "/keys/signing-key";
 var encryptionKeyExternalKeyId = "/keys/encryption-key";
 
@@ -22,26 +26,35 @@ var signingCertificate = CreateSelfSignedCertificate();
 
 var keyClient = new KeyClient(new Uri(keyVaultUri), new DefaultAzureCredential());
 
-var cryptoProviderFactory = new CryptoProviderFactory {
+var signingCryptoProviderFactory = new CryptoProviderFactory {
 	CustomCryptoProvider = new KeyVaultCryptoProvider(keyClient)
 };
 
 var signingKey = await keyClient.GetKeyAsync(signingKeyId);
+var encryptionKey = await keyClient.GetKeyAsync(encryptionKeyId);
+
 var keyVaultSigningKey = new KeyVaultRsaSecurityKey(signingKey, signingKeyExternalKid) {
-	CryptoProviderFactory = cryptoProviderFactory
+	CryptoProviderFactory = signingCryptoProviderFactory
+};
+
+var keyVaultWrapKey = new KeyVaultRsaSecurityKey(encryptionKey, encryptionKeyExternalKeyId) {
+	CryptoProviderFactory = signingCryptoProviderFactory
 };
 
 var handler = new JsonWebTokenHandler();
+
 var token = handler.CreateToken(new SecurityTokenDescriptor {
 	Issuer = "https://test.fi",
-	SigningCredentials = new SigningCredentials(keyVaultSigningKey, SecurityAlgorithms.RsaSha256)
+	SigningCredentials = new SigningCredentials(keyVaultSigningKey, signingAlgorithm),
+	EncryptingCredentials = new EncryptingCredentials(keyVaultWrapKey, cekEncryptionAlgorithm, jwtEncryptionAlgorithm)
 });
 
 var validationResult = await handler.ValidateTokenAsync(token, new TokenValidationParameters {
 	ValidateIssuer = true,
 	ValidateAudience = false,
 	ValidIssuer = "https://test.fi",
-	IssuerSigningKey = keyVaultSigningKey
+	IssuerSigningKey = keyVaultSigningKey,
+	TokenDecryptionKey = keyVaultWrapKey
 });
 
 Console.WriteLine(token);
@@ -51,9 +64,6 @@ if (!validationResult.IsValid) {
 }
 
 
-// var signingAlgorithm = SecurityAlgorithms.RsaSha256;
-// var cekEncryptionAlgorithm = SecurityAlgorithms.RsaOAEP;
-// var jwtEncryptionAlgorithm = SecurityAlgorithms.Aes256CbcHmacSha512;
 // var issuer = "https://test.fi";
 //
 // var encryptionCertificate = CreateSelfSignedCertificate();

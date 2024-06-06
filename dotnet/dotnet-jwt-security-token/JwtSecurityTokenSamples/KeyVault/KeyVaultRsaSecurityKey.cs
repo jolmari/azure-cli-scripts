@@ -19,7 +19,7 @@ public sealed class KeyVaultRsaSecurityKey : AsymmetricSecurityKey {
 	public string KeyName => Key.Properties.Name;
 	public string KeyVersion => Key.Properties.Version;
 	public string Thumbprint => GetKeyId(Key);
-	
+
 	[Obsolete("HasPrivateKey method is deprecated, please use PrivateKeyStatus instead.")]
 	public override bool HasPrivateKey => true;
 	public override PrivateKeyStatus PrivateKeyStatus => PrivateKeyStatus.Exists;
