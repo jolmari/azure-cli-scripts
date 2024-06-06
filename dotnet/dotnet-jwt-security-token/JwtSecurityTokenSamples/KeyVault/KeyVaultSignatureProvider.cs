@@ -16,6 +16,7 @@ public class KeyVaultKeySignatureProvider : SignatureProvider {
 	}
 
 	public override byte[] Sign(byte[] input) => throw new NotImplementedException();
+	
 	public override bool Sign(ReadOnlySpan<byte> data, Span<byte> destination, out int bytesWritten) {
 		if (data == null || data.Length == 0) {
 			throw new ArgumentNullException(nameof(data));
