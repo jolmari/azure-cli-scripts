@@ -39,7 +39,7 @@ public static class JsonTokenBuilder {
 	/// <param name="jwtEncryptionAlgorithm"></param>
 	/// <param name="issuer"></param>
 	/// <returns></returns>
-	public static string BuildJweWrappedJwt(X509Certificate2 signingCertificate, X509Certificate2 encryptionCertificate, 
+	public static string BuildJweWrappedJwt(X509Certificate2 signingCertificate, X509Certificate2 encryptionCertificate,
 		string signingAlgorithm, string cekEncryptionAlgorithm, string jwtEncryptionAlgorithm, string issuer) {
 
 		// Create the security key from the x509 certificate and set a custom key identifier which will appear in the
@@ -47,12 +47,12 @@ public static class JsonTokenBuilder {
 		var x509SecurityKey = new X509SecurityKey(signingCertificate) {
 			KeyId = "jwt-signing-key"
 		};
-		
-		// Use the private signing key to sign the token.
+
+		// Use the private signing key part of the X509 certificate to sign the token.
 		var x509SigningCredentials = new SigningCredentials(x509SecurityKey, signingAlgorithm);
 
 		var securityTokenHandler = new JsonWebTokenHandler();
-		
+
 		// Use the public encryption key to encrypt the token.
 		var encryptingCredentials = new EncryptingCredentials(
 			new X509SecurityKey(encryptionCertificate) {
