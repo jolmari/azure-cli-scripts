@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JwtSecurityTokenSamples", "JwtSecurityTokenSamples.csproj", "{DB9F7645-DA49-4EC7-97EC-838E3DC61007}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "./JwtSecurityTokenSamples", "./JwtSecurityTokenSamples/JwtSecurityTokenSamples.csproj", "{DB9F7645-DA49-4EC7-97EC-838E3DC61007}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JwtSecurityTokenSamples.Tests", "JwtSecurityTokenSamples.Tests\JwtSecurityTokenSamples.Tests.csproj", "{00B2CDA8-2A11-4285-9B6A-2E2365961151}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -12,5 +14,13 @@ Global
 		{DB9F7645-DA49-4EC7-97EC-838E3DC61007}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DB9F7645-DA49-4EC7-97EC-838E3DC61007}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DB9F7645-DA49-4EC7-97EC-838E3DC61007}.Release|Any CPU.Build.0 = Release|Any CPU
+		{027969AD-1833-4F4C-BE7D-166C73E85A1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{027969AD-1833-4F4C-BE7D-166C73E85A1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{027969AD-1833-4F4C-BE7D-166C73E85A1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{027969AD-1833-4F4C-BE7D-166C73E85A1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00B2CDA8-2A11-4285-9B6A-2E2365961151}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00B2CDA8-2A11-4285-9B6A-2E2365961151}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00B2CDA8-2A11-4285-9B6A-2E2365961151}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00B2CDA8-2A11-4285-9B6A-2E2365961151}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
